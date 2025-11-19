@@ -1,0 +1,1070 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Digital Library</title>
+<style>
+:root {
+  --color-primary: #eef4fe;
+  --color-accent: #1e40af;
+  --color-accent-2: #bce2ff;
+  --color-text: #333;
+  --color-background: #f5f5f5;
+  --color-content-bg: #fff;
+  --color-border: #c0c0c0;
+  --color-hover-bg: #f0f0f0;
+  --color-active-bg-light: #e5eeff;
+  --color-active-hover-bg: #d9e8fd;
+  --color-table-row-light: #f7f7f7;
+  --color-table-header: #dedede;
+}
+
+body.dark-theme {
+  --color-primary: #253044;
+  --color-accent: #64b5f6;
+  --color-accent-2: #113858;
+  --color-text: #e0e0e0;
+  --color-background: #1a1a1a;
+  --color-content-bg: #252525;
+  --color-border: #505050;
+  --color-hover-bg: #383838;
+  --color-active-bg-light: #2c486c;
+  --color-active-hover-bg: #2f5386;
+  --color-table-row-light: #2c2c2c;
+  --color-table-header: #444;
+}
+
+/* Reset */
+*, *::before, *::after {
+  box-sizing: border-box;
+} 
+
+html {
+  font-size: 62.5%;
+  max-width: 100%;
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  font-family: Noto Serif, serif;
+  background-color: var(--color-background);
+  color: var(--color-text);
+  font-size: 1.6rem;
+}
+
+button {
+  width: 100%;
+  color: var(--color-text);
+  background: none;
+  border: none;
+}
+
+/* --- Top Bar --- */
+#top-bar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4rem;
+  background-color: var(--color-primary);
+  color: var(--color-text);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 1.6rem;
+  z-index: 1000;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.3);
+}
+
+#center-group {
+    display: flex;
+    align-items: center;
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+}
+
+#center-group a {
+    font-size: 1.7rem;
+    font-weight: 700;
+    color: var(--color-text);
+    text-decoration: none;
+    user-select: none;
+    padding: 0 4rem;
+}
+
+#menu-toggle, #settings-toggle {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0 2rem;
+  font-size: 2.3rem;
+  display: flex;
+  position: relative;
+  justify-content: center;
+  width: 3.2rem;
+  height: 3.2rem;
+}
+
+#settings-toggle {
+  transform: translateY(1px); 
+}
+
+.nav-arrow {
+  font-size: 2.2rem;
+  background: none;
+  border: none;
+  cursor: pointer;
+  transition: opacity 0.2s ease;
+  padding: 0 1rem;
+}
+
+.nav-arrow.disabled {
+  opacity: 0.45;
+  pointer-events: none;
+  cursor: default;
+}
+
+/* --- Settings Menu --- */
+.settings-menu {
+  position: fixed;
+  top: 5.5rem;
+  right: 2rem;
+  background-color: var(--color-content-bg);
+  border: 1px solid var(--color-border);
+  box-shadow: 0 0px 12px 2px rgba(0,0,0,0.15);
+  min-width: 12.5rem;
+  display: none;
+  z-index: 1001;
+  color: var(--color-text);
+}
+.settings-menu.visible {
+  display: block;
+}
+.settings-header {
+  padding: 0.8rem 1.6rem;
+  font-weight: 700;
+  font-size: 1.4rem;
+  border-bottom: 1px solid var(--color-border);
+}
+.settings-item {
+  padding: 0.6rem 2.6rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+  font-size: 1.4rem;
+}
+.settings-item:hover {
+  background-color: var(--color-hover-bg);
+}
+.settings-item:active {
+  background-color: var(--color-border);
+}
+.settings-item.active {
+  background-color: var(--color-active-bg-light);
+  color: var(--color-accent);
+}
+
+.settings-item.active:hover {
+  background-color: var(--color-active-hover-bg);
+}
+
+/* --- Sidebar (Navigation) --- */
+#sidebar {
+  z-index: 999;
+  position: fixed;
+  top: 4rem;
+  left: 0;
+  width: 26rem;
+  height: calc(100vh - 4rem);
+  background-color: var(--color-content-bg);
+  overflow-y: auto;
+  transition: transform .3s ease;
+  box-shadow: 2px 0 4px rgba(0,0,0,0.2);
+  padding-bottom: 4rem;
+}
+#sidebar.hidden {
+  transform: translateX(-26rem);
+}
+
+#sidebar ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+#sidebar li {
+  border-bottom: 1px solid var(--color-border);
+  overflow-wrap: anywhere;
+  margin: 0;
+}
+
+#sidebar li.book-page > a {
+  font-weight: 700;
+  padding: 1rem 1rem 1rem 1rem;
+  text-align: center;
+  font-size: 1.5rem;
+}
+
+#sidebar li.prominent > a {
+  font-weight: 600;
+  padding: 0.75rem 1rem 0.75rem 1rem;
+}
+
+#sidebar a {
+  display: block;
+  text-decoration: none;
+  color: var(--color-text);
+  padding: 0.5rem 1rem 0.5rem 1rem;
+  user-select: none;
+  font-size: 1.4rem;
+}
+
+#sidebar a:hover {
+  background-color: var(--color-hover-bg);
+}
+#sidebar a:active {
+  background-color: var(--color-border);
+}
+#sidebar a.active {
+  background-color: var(--color-active-bg-light);
+  color: var(--color-accent);
+}
+#sidebar a.active:hover {
+  background-color: var(--color-active-hover-bg);
+}
+
+/* --- Main Content Area --- */
+#main-content {
+  margin-left: 26rem;
+  margin-top: 4rem;
+  padding: 0 3rem;
+  transition: margin-left .3s, opacity 0.3s ease;;
+  display: flex;
+  justify-content: center;
+  width: auto;
+  min-height: calc(100vh - 4rem);
+}
+#sidebar.hidden + #main-content {
+  margin-left: 0;
+  justify-content: center;
+}
+
+.content-section {
+  background-color: var(--color-content-bg);
+  padding: 2rem 3rem;
+  margin-top: 3rem;
+  margin-bottom: 3rem;
+  box-shadow: 0 0px 3px 1px rgba(0,0,0,0.2);
+  width: 100%;
+  max-width: 75vw;
+  height: min-content;
+}
+.content-section h1 {
+  margin-bottom: 2rem;
+  margin-top: 0rem;
+  font-size: 2.8rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid var(--color-text);
+}
+
+.content-section h2 {
+  margin-top: 4rem;
+  margin-bottom: 1.5rem;
+  font-size: 2rem;
+  clear: right;
+}
+.content-section p {
+  line-height: 1.5;
+  margin-bottom: 1.5rem;
+}
+
+/* --- Spoiler/Accordion Area --- */
+.spoiler-area {
+  margin: 2rem 0;
+  max-width: 100%;
+  border: 1px solid var(--color-border);
+  overflow: visible; 
+}
+
+.spoiler-header {
+  background-color: var(--color-active-bg-light); 
+  color: var(--color-text); 
+  padding: 0.8rem 1.5rem;
+  font-size: 1.6rem;
+  font-weight: 600;
+  cursor: pointer;
+  display: flex;
+  align-items: center; 
+  justify-content: space-between;
+  border: none;
+}
+
+.spoiler-header:hover {
+  background-color: var(--color-active-hover-bg);
+}
+
+.spoiler-toggle {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.5rem;
+  height: 100%;
+  margin-left: 1.5rem; 
+  flex-shrink: 0; 
+}
+
+.spoiler-toggle .icon {
+  font-size: 1.8rem;
+  line-height: 1;
+  transition: transform 0.2s ease; 
+  user-select: none;
+  transform: rotate(0deg);
+  opacity: 0.5;
+}
+
+.spoiler-content {
+  background-color: var(--color-content-bg);
+  padding: 0 1.5rem;
+  max-height: 0; 
+  overflow: hidden;
+  transition: none;
+  border: none;
+}
+
+.spoiler-area.open .spoiler-header {
+  border-bottom: 1px solid var(--color-border);
+  color: var(--color-accent);
+}
+
+.spoiler-area.open .spoiler-toggle .icon {
+  transform: rotate(90deg);
+  opacity: 0.75;
+  color: var(--color-accent);
+}
+
+.spoiler-area.open .spoiler-content {
+  max-height: 8000px;
+  padding: 0 1.5rem;
+}
+
+.spoiler-content p:last-child {
+  margin-bottom: 2rem; 
+}
+
+/* --- Tables and Data --- */
+table {
+  margin-left: auto;
+  margin-right: auto;
+  width: 100%;
+  max-width: 60rem;
+  border-collapse: collapse;
+  font-size: 1.5rem;
+  table-layout: auto;
+}
+.table-wrapper {
+  width: 100%;
+  margin: 1.5rem auto; 
+  max-width: 60rem;
+  display: flex;
+  justify-content: center;
+}
+
+th, td {
+  border: 1px solid var(--color-border);
+  padding: 0.6rem 0.8rem;
+  text-align: left;
+}
+th {
+  background-color: var(--color-table-header);
+  font-weight: 600;
+}
+
+.sticky-header table {
+  position: relative;
+}
+
+table.sticky-header th {
+  position: sticky;
+  top: 4rem;
+  z-index: 2;
+  overflow-y: auto;
+}
+
+table.sortable th {
+  position: relative;
+  padding-right: 2.4rem;
+}
+.sort-button {
+  position: absolute;
+  right: 0.4rem;
+  top: 50%;
+  transform: translateY(-50%);
+  display: inline-flex;
+  flex-direction: column;
+  gap: 0.1rem;
+  cursor: pointer;
+  user-select: none;
+  padding: 0.5rem;
+  line-height: 0.5;
+}
+.sort-button .arrow {
+  font-size: 0.9em;
+  opacity: 0.5;
+  transform: scale(1, .6);
+  display: block;
+}
+.sort-button .arrow.active {
+  opacity: 1;
+  color: var(--color-accent);
+}
+
+tr:nth-child(even) td {
+  background-color: var(--color-table-row-light);
+}
+
+/* --- Code and Figures --- */
+pre {
+  font-family: Noto Mono, monospace;
+  background-color: var(--color-table-row-light);
+  border: 1px solid var(--color-border);
+  padding: 1rem;
+  font-size: 1.4rem;
+  overflow-x: auto;
+  margin: 1.5rem 0; 
+  white-space: pre;
+}
+pre code {
+  background: none;
+  border: none;
+  padding: 0;
+  font-family: inherit;
+  color: inherit;
+}
+
+caption, figcaption {
+  font-size: 1.3rem;
+  margin-top: 0.8rem;
+  caption-side: bottom;
+  text-align: left;
+  color: var(--color-text);
+}
+
+figure {
+  margin: 2.5rem auto;
+  display: table; 
+}
+
+.image-wrapper {
+  width: 100%;
+  max-width: 80rem;
+  margin: 0;
+}
+.image-wrapper img {
+  max-width: 100%;
+  display: block;
+  object-fit: contain;
+}
+
+figcaption {
+  display: table-caption;
+  caption-side: bottom;
+}
+
+/* --- Side-by-Side Images --- */
+.figure-row {
+    display: flex;
+    gap: 2rem;
+    margin: 2.5rem auto;
+    justify-content: center;
+    align-items: flex-start;
+    max-width: 100%;
+    overflow: visible;
+}
+
+.figure-row figure {
+    margin: 0;
+    display: inline-flex;
+    flex-direction: column;
+    width: auto;
+    min-width: 0;
+    flex-shrink: 1;
+}
+
+.figure-row .image-wrapper {
+    display: block;
+    width: auto;
+    max-width: none;
+    min-width: 0;
+}
+
+.figure-row img {
+    height: auto;
+    width: auto;
+    max-width: 100%;
+    object-fit: contain;
+    display: block;
+}
+
+.figure-row figcaption {
+    display: block;
+    max-width: 100%;
+}
+
+/* --- Right Alignment Utility (Floating Layout) */
+.align-right {
+    float: right;
+    margin-left: 3rem;
+    margin-bottom: 2rem;
+    margin-top: 0;
+}
+
+figure.align-right {
+    max-width: 35%;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    float: right;
+}
+figure.align-right .image-wrapper {
+    max-width: 100%;
+    margin: 0;
+}
+
+figure.align-right img {
+    margin: 0;
+    display: block;
+    width: 100%;
+}
+
+.table-wrapper.align-right {
+    display: block;
+    max-width: 35rem;
+    
+}
+.table-wrapper.align-right table {
+    max-width: 100%;
+    margin-left: 0;
+    margin-right: 0;
+}
+
+/* --- Responsive Layout --- */
+@media (max-width:900px) {
+  #sidebar { 
+    transform: translateX(-26rem); 
+    transition: transform 0.3s;
+  }
+  #sidebar.visible { 
+    transform: translateX(0); 
+  }
+  #main-content {
+    margin-left: 0;
+    padding: 0 1.5rem;
+  }
+  #sidebar.visible ~ #main-content {
+    opacity: 0.3;
+    pointer-events: none;
+  }
+  .content-section {
+    padding: 1.5rem;
+    max-width: 100%;
+  }
+  .image-wrapper {
+    max-width: 100%;
+    overflow: hidden;
+  }
+
+  .table-wrapper,
+  figure.align-right, 
+  .table-wrapper.align-right {
+    float: none; 
+    margin: 1.5rem 0; 
+    width: 100%; 
+    max-width: 100%; 
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    text-align: left;
+  }
+
+  .figure-row {
+    flex-direction: column;
+    gap: 2rem;
+  }
+
+  .figure-row figure {
+    width: 100%;
+  }
+
+  .figure-row .image-wrapper {
+    width: 100%;
+  }
+
+  .figure-row img {
+    width: 100%;
+    height: auto;
+  }
+
+  figure,
+  .image-wrapper,
+  .image-wrapper img {
+    width: 100%;
+    max-width: 100% ;
+  }
+
+  figure.align-right .image-wrapper {
+    width: 100%;
+    max-width: 100%;
+    margin: 0;
+  }
+
+  figure.align-right img {
+    width: 100%;
+    height: auto;
+    display: block;
+  }
+
+  figure.align-right figcaption {
+    align-self: flex-start;
+    text-align: left;
+    width: 100%;
+    margin-top: 0.5rem;
+  }
+
+  .table-wrapper table,
+  .table-wrapper.align-right table {
+    margin-left: auto;
+    margin-right: auto;
+    max-width: 100%;
+  }
+
+  .spoiler-area {
+    max-width: 100%;
+  }
+}
+</style>
+</head>
+<body>
+
+  <div id="top-bar">
+    <button id="menu-toggle" title="Sidebar">☰</button>
+    <div id="center-group">
+      <button id="prev-page" class="nav-arrow">←</button>
+      <a href="index.html" title="Main Page">Main</a>
+      <button id="next-page" class="nav-arrow">→</button>
+  </div>
+    <button id="settings-toggle" title="Settings">◐</button>
+  </div>
+
+<div id="settings-menu" class="settings-menu">
+    <div class="settings-header">Theme</div>
+    <button class="settings-item" data-theme="light">Light</button>
+    <button class="settings-item" data-theme="dark">Dark</button>
+    <button class="settings-item active" data-theme="auto">Auto</button>
+</div>
+
+<nav id="sidebar">
+<ul>
+<li class="book-page"><a href="book-page.html">Book Name</a></li>
+<li class="prominent"><a href="part1.html">Part I: Novice</a></li>
+<li><a href="chapter1.html">Chapter 1: Introduction</a></li>
+<li><a href="chapter2.html">Chapter 2: History</a></li>
+<li><a href="chapter3.html">Chapter X</a></li>
+<li><a href="chapter4.html">Chapter X</a></li>
+<li class="prominent"><a href="part2.html">Part 2: Intermediate</a></li>
+<li><a href="chapter7.html">Chapter X</a></li>
+<li><a href="chapter8.html">Chapter X</a></li>
+<li><a href="chapter9.html">Chapter X</a></li>
+<li><a href="chapter10.html">Chapter X</a></li>
+<li><a href="chapter10.html">Chapter 1</a></li>
+</ul>
+</nav>
+
+<main id="main-content">
+<article class="content-section">
+
+<h1>Chapter 1: A super long title of the chapter</h1>
+
+<p>Digital reading has transformed how people consume books and articles. The convenience of instant access, adjustable fonts, and cloud synchronization has created a new era of reading experiences that bridge accessibility and technology.</p>
+
+<p>Plain text paragraph example:
+The digital age has brought about an unprecedented level of information accessibility. Readers can now carry thousands of books in a single device and synchronize progress across platforms. This revolution has also encouraged self-publishing, allowing independent authors to reach global audiences without traditional gatekeepers.</p>
+
+<h2>Content Spoiler (Accordion) Example</h2>
+
+<div class="spoiler-area">
+    <div class="spoiler-header">
+        Click to reveal critical analysis
+    </div>
+    <div class="spoiler-content">
+        <p>The analysis reveals that the protagonist's journey is a classic example of the monomyth structure, specifically focusing on the refusal of the call during Chapter 3.</p>
+        <p>This is reinforced by the consistent use of water imagery, symbolizing rebirth and transformation, even when the character attempts to regress to a former state of ignorance.</p>
+        <p>More text to force scrolling...</p>
+        <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.</p>
+        <p>Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.</p>
+        <p>Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>
+        <p>Final paragraph for the long spoiler content.</p>
+    </div>
+</div>
+
+<div class="spoiler-area">
+    <div class="spoiler-header">
+        Show supplemental reading list
+    </div>
+    <div class="spoiler-content">
+        <p>1. Campbell, J. *The Hero with a Thousand Faces*.</p>
+        <p>2. Jung, C. G. *The Archetypes and the Collective Unconscious*.</p>
+        <p>3. Vogler, C. *The Writer's Journey*.</p>
+    </div>
+</div>
+
+<h2>Sortable table</h2>
+<div class="table-wrapper"> <table class="sortable">
+    <caption>Table 1: A table.</caption>
+    <thead>
+    <tr><th>Letters</th><th>Numbers</th></tr>
+    </thead>
+    <tbody>
+    <tr><td>A</td><td>001</td></tr>
+    <tr><td>B</td><td>1,0</td></tr>
+    <tr><td>Z</td><td>1,0</td></tr>
+    <tr><td>a</td><td>2.0</td></tr>
+    <tr><td>b</td><td>2,0</td></tr>
+    <tr><td>z</td><td>0,0</td></tr>
+    </tbody>
+    </table>
+</div>
+
+<h2>Sticky header table</h2>
+<div class="table-wrapper"> <table class="sticky-header">
+    <caption>Table 2: A table sdfsfs fdsfskfksdfmak flsdfalsdf,alf dfakmdfa dfskmfmdskl sdfsfs fdsfskfksdfmak flsdfalsdf,alf dfakmdfa dfskmfmdskl</caption>
+    <thead>
+    <tr><th>Letters</th><th>Numbers</th></tr>
+    </thead>
+    <tbody>
+    <tr><td>A</td><td>001</td></tr>
+    <tr><td>B</td><td>1,0</td></tr>
+    <tr><td>Z</td><td>1,0</td></tr>
+    <tr><td>a</td><td>2.0</td></tr>
+    <tr><td>b</td><td>2,0</td></tr>
+    <tr><td>z</td><td>0,0</td></tr>
+    </tbody>
+    </table>
+</div>
+
+<h2>A</h2>
+<figure>
+    <div class="image-wrapper">
+        <img src="https://placehold.co/1000x500/eeeeee/999999">
+    </div>
+    <figcaption>.sdfsfs fdsfskfksdfmak flsdfalsdf,alf dfakmdfa dfskmfmdskl sdfsfs fdsfskfksdfmak flsdfalsdf,alf dfakmdfa dfskmfmdskl</figcaption>
+</figure>
+
+<div class="table-wrapper"> <table>
+    <caption>Table 3: Library Titles</caption>
+    <tr><td>Fiction</td><td>1240 Titles</td></tr>
+    <tr><td>Non-fiction</td><td>980 Titles</td></tr>
+    <tr><td>Science</td><td>640 Titles</td></tr>
+    <tr><td>History</td><td>310 Titles</td></tr>
+    </table>
+</div>
+
+<h2>a</h2>
+<figure class="align-right">
+    <div class="image-wrapper">
+        <img src="https://placehold.co/300x200/eeeeee/999999" alt="Placeholder image 400x200">
+    </div>
+    <figcaption>Figure 1 – This image is now floated right, allowing the subsequent text to wrap around it.</figcaption>
+</figure>
+
+<pre><code>// Example
+some code...
+more...
+</code></pre>
+
+<h2>Image Example (Right-Aligned with Text Wrap)</h2>
+<figure class="align-right">
+    <div class="image-wrapper">
+        <img src="https://placehold.co/200x200/eeeeee/999999" alt="Placeholder image 400x200">
+    </div>
+    <figcaption>Figure 1 – This image is now floated right, allowing the subsequent text to wrap around it.</figcaption>
+</figure>
+
+<p>This paragraph now demonstrates **text wrapping** around the floating image on the right. Floats are traditionally used for images and small content blocks in articles to create dynamic layouts where text fills the remaining space. Since the floating element has a defined width and is pulled to the right, the paragraphs here will occupy the remaining space on the left until they clear the bottom of the image.</p>
+
+<p>If you add more text, it will continue to flow here, wrapping nicely around the image until it reaches the end of the image block. This provides a much more professional and engaging reading experience compared to stacked blocks.</p>
+
+<p>The consistent spacing of 2rem after the `h2` header above remains intact, ensuring that headers don't get accidentally pulled too close to the floating elements.</p>
+
+<h2>Table Example (Right-Aligned with Text Wrap)</h2>
+<div class="table-wrapper align-right">
+    <table>
+    <caption>Table 4: Right-aligned data with text wrapping.</caption>
+    <tr><td>Itemaaaaaaaaa Itemaaaaaaaaa Itemaaaaaaaaa</td><td>Value Itemaaaaaaaaa Itemaaaaaaaaa</td></tr>
+    <tr><td>Alpha</td><td>100</td></tr>
+    <tr><td>Beta</td><td>200</td></tr>
+    <tr><td>Gamma</td><td>300</td></tr>
+    <tr><td>Delta</td><td>400</td></tr>
+    </table>
+</div>
+
+<p>This paragraph wraps around the right-aligned table above. Like the image, the table has been given a set maximum width (35rem) to ensure there is enough room for the text to flow smoothly alongside it. This technique is highly effective for displaying ancillary data or small figures without breaking the primary flow of the reading material.</p>
+
+<p>Remember that on smaller screens (below 900px), these elements will automatically stop floating and return to their default, centered, full-width stacking behavior to maintain a good mobile experience.</p>
+
+<h2>Side-by-Side Images Example</h2>
+<div class="figure-row">
+    <figure>
+        <div class="image-wrapper">
+            <img src="https://placehold.co/400x300/eeeeee/999999" alt="First image">
+        </div>
+        <figcaption>Figure 2a – This is the caption for the first image in the pair.</figcaption>
+    </figure>
+    <figure>
+        <div class="image-wrapper">
+            <img src="https://placehold.co/600x300/eeeeee/999999" alt="Second image">
+        </div>
+        <figcaption>Figure 2b – This is the caption for the second image, which has a different width but same height.</figcaption>
+    </figure>
+</div>
+
+<p>The two images above are displayed side-by-side with the same height, maintaining their original aspect ratios. Notice how one image is wider than the other, yet they align properly at the top.</p>
+</article>
+</main>
+
+<script>
+  // --- DOM Elements ---
+const body = document.body;
+const settingsToggle = document.getElementById('settings-toggle');
+const settingsMenu = document.getElementById('settings-menu');
+const settingsItems = document.querySelectorAll('.settings-item');
+const sidebar = document.getElementById('sidebar');
+const menuToggle = document.getElementById('menu-toggle');
+
+// --- Utility: Debounce ---
+function debounce(fn, delay) {
+    let timer;
+    return (...args) => {
+        clearTimeout(timer);
+        timer = setTimeout(() => fn(...args), delay);
+    };
+}
+
+// --- Theme Management ---
+let currentTheme = localStorage.getItem('theme') || 'auto';
+
+function applyTheme(theme) {
+    settingsItems.forEach(i => i.classList.toggle('active', i.dataset.theme === theme));
+    const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+    body.classList.toggle('dark-theme', theme === 'dark' || (theme === 'auto' && prefersDark));
+    localStorage.setItem('theme', theme);
+}
+applyTheme(currentTheme);
+
+// Toggle settings menu
+settingsToggle.onclick = e => {
+    e.stopPropagation();
+    settingsMenu.classList.toggle('visible');
+};
+
+// Theme selection
+settingsItems.forEach(item => {
+    item.onclick = () => {
+        applyTheme(item.dataset.theme);
+        settingsMenu.classList.remove('visible');
+    };
+});
+
+// Close settings when clicking outside
+document.addEventListener('click', e => {
+    if (!settingsMenu.contains(e.target) && !settingsToggle.contains(e.target)) {
+        settingsMenu.classList.remove('visible');
+    }
+});
+
+// Update theme on system preference change
+window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', e => {
+    if (localStorage.getItem('theme') === 'auto') {
+        body.classList.toggle('dark-theme', e.matches);
+    }
+});
+
+function isMobile() { return window.innerWidth <= 900; }
+
+function toggleSidebar() {
+if (isMobile()) {
+sidebar.classList.toggle('visible');
+} else {
+sidebar.classList.toggle('hidden');
+localStorage.setItem('sidebarState', sidebar.classList.contains('hidden') ? 'hidden' : 'visible');
+}}
+
+menuToggle.addEventListener('click', e => {
+e.stopPropagation();
+toggleSidebar();
+});
+
+// Close mobile sidebar on outside click
+document.addEventListener('click', e => {
+    if (window.innerWidth <= 900 && !sidebar.contains(e.target) && !menuToggle.contains(e.target)) {
+        sidebar.classList.remove('visible');
+    }
+});
+
+// Restore sidebar hidden state on desktop
+if (localStorage.getItem('sidebarState') === 'hidden') sidebar.classList.add('hidden');
+
+// --- Active Sidebar Item ---
+function setActiveSidebarItem() {
+    const current = window.location.pathname.split('/').pop().split('?')[0].split('#')[0];
+    document.querySelectorAll('#sidebar a').forEach(link => {
+        link.classList.toggle('active', link.getAttribute('href') === current);
+    });
+}
+
+// --- Sortable Tables ---
+function makeTableSortable(table) {
+    const headers = table.tHead?.rows[0]?.cells;
+    if (!headers) return;
+
+    const tbody = table.tBodies[0];
+    const originalOrder = Array.from(tbody.rows).map(row => row.cloneNode(true));
+    let currentSort = { column: null, direction: 'none' };
+
+    Array.from(headers).forEach((header, index) => {
+        const sortBtn = document.createElement('span');
+        sortBtn.className = 'sort-button';
+        sortBtn.innerHTML = '<span class="arrow">▲</span><span class="arrow">▼</span>';
+        header.appendChild(sortBtn);
+
+        sortBtn.addEventListener('click', () => {
+            let direction = 'asc';
+            if (currentSort.column === index) {
+                direction = currentSort.direction === 'asc' ? 'desc' : currentSort.direction === 'desc' ? 'none' : 'asc';
+            }
+
+            table.querySelectorAll('.sort-button .arrow').forEach(a => a.classList.remove('active'));
+
+            if (direction === 'none') {
+                resetToDefaultOrder(tbody, originalOrder);
+            } else {
+                sortColumn(tbody, index, direction);
+                const arrows = sortBtn.querySelectorAll('.arrow');
+                arrows[direction === 'asc' ? 0 : 1].classList.add('active');
+            }
+
+            currentSort = { column: index, direction };
+        });
+    });
+}
+
+function sortColumn(tbody, colIndex, direction) {
+    const rows = Array.from(tbody.rows);
+    const isAsc = direction === 'asc';
+    const sample = rows.map(r => r.cells[colIndex]?.textContent.trim()).find(v => v);
+    const isNumeric = sample && /^-?\d+([.,]\d+)?$/.test(sample);
+
+    rows.sort((a, b) => {
+        let aVal = a.cells[colIndex]?.textContent.trim() || '';
+        let bVal = b.cells[colIndex]?.textContent.trim() || '';
+        if (isNumeric) {
+            const aNum = parseFloat(aVal.replace(',', '.')) || 0;
+            const bNum = parseFloat(bVal.replace(',', '.')) || 0;
+            return isAsc ? aNum - bNum : bNum - aNum;
+        } else {
+            return isAsc ? aVal.localeCompare(bVal, undefined, { sensitivity: 'base' }) 
+                         : bVal.localeCompare(aVal, undefined, { sensitivity: 'base' });
+        }
+    });
+
+    rows.forEach(r => tbody.appendChild(r));
+}
+
+function resetToDefaultOrder(tbody, original) {
+    tbody.innerHTML = '';
+    original.forEach(r => tbody.appendChild(r.cloneNode(true)));
+}
+
+// --- Spoiler/Accordion Functionality ---
+document.querySelectorAll('.spoiler-area').forEach(spoiler => {
+    const header = spoiler.querySelector('.spoiler-header');
+    
+    const toggleDiv = document.createElement('div');
+    toggleDiv.className = 'spoiler-toggle';
+    toggleDiv.innerHTML = '<span class="icon">►</span>';
+    header.appendChild(toggleDiv);
+    
+    header.addEventListener('click', () => {
+        spoiler.classList.toggle('open');
+    });
+});
+
+// --- Initialize on DOMContentLoaded ---
+document.addEventListener('DOMContentLoaded', () => {
+    document.querySelectorAll('table.sortable').forEach(makeTableSortable);
+    setActiveSidebarItem();
+    setupImageRowHeights();
+});
+
+// --- Prev/Next Navigation ---
+function setupPrevNextNavigation() {
+  const sidebarLinks = Array.from(document.querySelectorAll('#sidebar a[href]'));
+  const current = window.location.pathname.split('/').pop().split('?')[0].split('#')[0];
+  const currentIndex = sidebarLinks.findIndex(a => a.getAttribute('href') === current);
+
+  const prevBtn = document.getElementById('prev-page');
+  const nextBtn = document.getElementById('next-page');
+
+  const prevLink = currentIndex > 0 ? sidebarLinks[currentIndex - 1] : null;
+  const nextLink = currentIndex >= 0 && currentIndex < sidebarLinks.length - 1 ? sidebarLinks[currentIndex + 1] : null;
+
+  if (prevLink) {
+    prevBtn.onclick = () => location.href = prevLink.getAttribute('href');
+    prevBtn.title = prevLink.textContent.trim();
+  } else {
+    prevBtn.classList.add('disabled');
+  }
+
+  if (nextLink) {
+    nextBtn.onclick = () => location.href = nextLink.getAttribute('href');
+    nextBtn.title = nextLink.textContent.trim();
+  } else {
+    nextBtn.classList.add('disabled');
+  }
+}
+
+document.addEventListener('DOMContentLoaded', setupPrevNextNavigation);
+// --- Global Resize Handler (Centralized and Debounced) ---
+const handleGlobalResize = debounce(() => {
+    initializeSidebar();
+    // Removed call to image row height logic
+}, 150);
+
+// --- Initialize All Functions (Optimized for DOMContentLoaded) ---
+const initializeApp = () => {
+    const runOnLoad = () => {
+        document.querySelectorAll('table.sortable').forEach(makeTableSortable);
+        setActiveSidebarItem();
+        setupPrevNextNavigation();
+        initializeSidebar();
+        
+        // Attach the global debounced resize handler only once
+        window.addEventListener('resize', handleGlobalResize); 
+    };
+    
+    // Check if DOM is already loaded for instant execution
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', runOnLoad);
+    } else {
+        // Execute immediately if DOM is ready
+        runOnLoad();
+    }
+};
+
+</script>
+</body>
+</html>
