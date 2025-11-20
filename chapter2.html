@@ -6,6 +6,9 @@
 <title>Digital Library</title>
 <style>
 :root {
+  --sidebar-width-desktop: 27rem;
+  --sidebar-width-mobile: 25rem;
+
   --color-primary: #eef4fe;
   --color-accent: #1e40af;
   --color-accent-2: #bce2ff;
@@ -57,6 +60,7 @@ body {
 
 button {
   width: 100%;
+  font-family: Noto Serif, serif;
   color: var(--color-text);
   background: none;
   border: none;
@@ -74,34 +78,36 @@ button {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 0 1.6rem;
+  padding: 0 1.6rem 0.5rem 1.6rem;
   z-index: 1000;
   box-shadow: 0 2px 5px rgba(0,0,0,0.3);
+  gap: 1rem;
 }
 
-#center-group {
-    display: flex;
-    align-items: center;
-    position: absolute;
-    left: 50%;
-    transform: translateX(-50%);
-}
 
-#center-group a {
+#top-bar a {
     font-size: 1.7rem;
     font-weight: 700;
     color: var(--color-text);
     text-decoration: none;
     user-select: none;
-    padding: 0 4rem;
+    padding: 0.5rem 0 0 0;
+}
+
+#menu-toggle {
+  font-size: 2.3rem;
+}
+
+#settings-toggle {
+  font-size: 2.3rem;
+  transform: translateY(2px);
 }
 
 #menu-toggle, #settings-toggle {
   background: none;
   border: none;
   cursor: pointer;
-  padding: 0 2rem;
-  font-size: 2.3rem;
+  padding: 0;
   display: flex;
   position: relative;
   justify-content: center;
@@ -109,21 +115,17 @@ button {
   height: 3.2rem;
 }
 
-#settings-toggle {
-  transform: translateY(1px); 
-}
-
 .nav-arrow {
-  font-size: 2.2rem;
+  font-size: 3rem;
   background: none;
   border: none;
   cursor: pointer;
   transition: opacity 0.2s ease;
-  padding: 0 1rem;
+  padding: 0 1rem 0.2rem 1rem;
 }
 
 .nav-arrow.disabled {
-  opacity: 0.45;
+  opacity: 0.25;
   pointer-events: none;
   cursor: default;
 }
@@ -136,7 +138,7 @@ button {
   background-color: var(--color-content-bg);
   border: 1px solid var(--color-border);
   box-shadow: 0 0px 12px 2px rgba(0,0,0,0.15);
-  min-width: 12.5rem;
+  min-width: 12rem;
   display: none;
   z-index: 1001;
   color: var(--color-text);
@@ -148,10 +150,11 @@ button {
   padding: 0.8rem 1.6rem;
   font-weight: 700;
   font-size: 1.4rem;
+  text-align: center;
   border-bottom: 1px solid var(--color-border);
 }
 .settings-item {
-  padding: 0.6rem 2.6rem;
+  padding: 0.6rem 1.6rem;
   cursor: pointer;
   display: flex;
   align-items: center;
@@ -179,16 +182,16 @@ button {
   position: fixed;
   top: 4rem;
   left: 0;
-  width: 26rem;
+  width: var(--sidebar-width-desktop);
   height: calc(100vh - 4rem);
   background-color: var(--color-content-bg);
   overflow-y: auto;
-  transition: transform .3s ease;
+  transition: transform 0.3s ease;
   box-shadow: 2px 0 4px rgba(0,0,0,0.2);
   padding-bottom: 4rem;
 }
 #sidebar.hidden {
-  transform: translateX(-26rem);
+  transform: translateX(calc(-1 * var(--sidebar-width-desktop)));
 }
 
 #sidebar ul {
@@ -205,21 +208,25 @@ button {
 
 #sidebar li.book-page > a {
   font-weight: 700;
-  padding: 1rem 1rem 1rem 1rem;
+  padding: 0.9rem 1rem 0.8rem 1rem;
   text-align: center;
   font-size: 1.5rem;
 }
 
-#sidebar li.prominent > a {
+#sidebar li.prominent > a,
+#sidebar li.prominent > button {
+  text-align: left;
   font-weight: 600;
-  padding: 0.75rem 1rem 0.75rem 1rem;
+  padding: 0.6rem 1rem;
 }
 
-#sidebar a {
+#sidebar a,
+#sidebar button {
+  text-align: left;
   display: block;
   text-decoration: none;
   color: var(--color-text);
-  padding: 0.5rem 1rem 0.5rem 1rem;
+  padding: 0.6rem 1rem;
   user-select: none;
   font-size: 1.4rem;
 }
@@ -240,10 +247,10 @@ button {
 
 /* --- Main Content Area --- */
 #main-content {
-  margin-left: 26rem;
+  margin-left: var(--sidebar-width-desktop);
   margin-top: 4rem;
-  padding: 0 3rem;
-  transition: margin-left .3s, opacity 0.3s ease;;
+  padding: 0 clamp(1rem, 2vw, 2rem);
+  transition: margin-left 0.3s, opacity 0.3s ease;
   display: flex;
   justify-content: center;
   width: auto;
@@ -256,12 +263,12 @@ button {
 
 .content-section {
   background-color: var(--color-content-bg);
-  padding: 2rem 3rem;
-  margin-top: 3rem;
-  margin-bottom: 3rem;
+  padding: 2rem clamp(1rem, 2vw, 3rem);
+  margin-top: 2rem;
+  margin-bottom: 2rem;
   box-shadow: 0 0px 3px 1px rgba(0,0,0,0.2);
   width: 100%;
-  max-width: 75vw;
+  max-width: calc(100vw - var(--sidebar-width-desktop));
   height: min-content;
 }
 .content-section h1 {
@@ -372,6 +379,8 @@ table {
   max-width: 60rem;
   display: flex;
   justify-content: center;
+  /*display: block;
+  text-align: center;*/
 }
 
 th, td {
@@ -543,19 +552,26 @@ figure.align-right img {
 
 .table-wrapper.align-right {
     display: block;
-    max-width: 35rem;
+    max-width: min(35rem, 45%);
     
 }
 .table-wrapper.align-right table {
-    max-width: 100%;
+    width: 100%;
     margin-left: 0;
     margin-right: 0;
 }
+.table-wrapper.align-right table td,
+.table-wrapper.align-right table th {
+    word-break: break-word;
+    overflow-wrap: anywhere;
+    hyphens: auto;
+}
 
 /* --- Responsive Layout --- */
-@media (max-width:900px) {
+@media (max-width:800px) {
   #sidebar { 
-    transform: translateX(-26rem); 
+    width: var(--sidebar-width-mobile);
+    transform: translateX(-100%);
     transition: transform 0.3s;
   }
   #sidebar.visible { 
@@ -652,11 +668,9 @@ figure.align-right img {
 
   <div id="top-bar">
     <button id="menu-toggle" title="Sidebar">☰</button>
-    <div id="center-group">
-      <button id="prev-page" class="nav-arrow">←</button>
-      <a href="index.html" title="Main Page">Main</a>
-      <button id="next-page" class="nav-arrow">→</button>
-  </div>
+    <button id="prev-page" class="nav-arrow">←</button>
+    <a href="index.html" title="Main Page">Main</a>
+    <button id="next-page" class="nav-arrow">→</button>
     <button id="settings-toggle" title="Settings">◐</button>
   </div>
 
@@ -675,12 +689,13 @@ figure.align-right img {
 <li><a href="chapter2.html">Chapter 2: History</a></li>
 <li><a href="chapter3.html">Chapter X</a></li>
 <li><a href="chapter4.html">Chapter X</a></li>
-<li class="prominent"><a href="part2.html">Part 2: Intermediate</a></li>
+<li><button>Chapter 3</button></li>
+<li class="prominent"><button>Part 2: Intermediate</button></li>
 <li><a href="chapter7.html">Chapter X</a></li>
 <li><a href="chapter8.html">Chapter X</a></li>
 <li><a href="chapter9.html">Chapter X</a></li>
 <li><a href="chapter10.html">Chapter X</a></li>
-<li><a href="chapter10.html">Chapter 1</a></li>
+<li><a href="chapter11.html">Chapter 10</a></li>
 </ul>
 </nav>
 
@@ -814,7 +829,7 @@ more...
 
 <p>This paragraph wraps around the right-aligned table above. Like the image, the table has been given a set maximum width (35rem) to ensure there is enough room for the text to flow smoothly alongside it. This technique is highly effective for displaying ancillary data or small figures without breaking the primary flow of the reading material.</p>
 
-<p>Remember that on smaller screens (below 900px), these elements will automatically stop floating and return to their default, centered, full-width stacking behavior to maintain a good mobile experience.</p>
+<p>Remember that on smaller screens, these elements will automatically stop floating and return to their default, centered, full-width stacking behavior to maintain a good mobile experience.</p>
 
 <h2>Side-by-Side Images Example</h2>
 <div class="figure-row">
@@ -893,7 +908,7 @@ window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', e =
     }
 });
 
-function isMobile() { return window.innerWidth <= 900; }
+function isMobile() { return window.innerWidth <= 800; }
 
 function toggleSidebar() {
 if (isMobile()) {
@@ -910,12 +925,11 @@ toggleSidebar();
 
 // Close mobile sidebar on outside click
 document.addEventListener('click', e => {
-    if (window.innerWidth <= 900 && !sidebar.contains(e.target) && !menuToggle.contains(e.target)) {
+    if (window.innerWidth <= 800 && !sidebar.contains(e.target) && !menuToggle.contains(e.target)) {
         sidebar.classList.remove('visible');
     }
 });
 
-// Restore sidebar hidden state on desktop
 if (localStorage.getItem('sidebarState') === 'hidden') sidebar.classList.add('hidden');
 
 // --- Active Sidebar Item ---
@@ -1007,7 +1021,6 @@ document.querySelectorAll('.spoiler-area').forEach(spoiler => {
 document.addEventListener('DOMContentLoaded', () => {
     document.querySelectorAll('table.sortable').forEach(makeTableSortable);
     setActiveSidebarItem();
-    setupImageRowHeights();
 });
 
 // --- Prev/Next Navigation ---
@@ -1041,7 +1054,6 @@ document.addEventListener('DOMContentLoaded', setupPrevNextNavigation);
 // --- Global Resize Handler (Centralized and Debounced) ---
 const handleGlobalResize = debounce(() => {
     initializeSidebar();
-    // Removed call to image row height logic
 }, 150);
 
 // --- Initialize All Functions (Optimized for DOMContentLoaded) ---
