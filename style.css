@@ -13,7 +13,7 @@
   --color-active-bg-light: #e5eeff;
   --color-active-hover-bg: #d9e8fd;
   --color-table-row-light: #f7f7f7;
-  --color-table-header: #dedede;
+  --color-table-header: #e4e3e3;
 }
 
 body.dark-theme {
@@ -90,16 +90,6 @@ button {
   user-select: none;
 }
 
-#top-bar a:hover {
-  color: var(--color-accent);
-  text-shadow: 1px 1px 3px rgba(0,0,0,0.3);
-}
-
-#top-bar button:hover {
-  color: var(--color-accent);
-  text-shadow: 1px 1px 3px rgba(0,0,0,0.3);
-}
-
 #menu-toggle, #settings-toggle {
   cursor: pointer;
   display: flex;
@@ -157,19 +147,12 @@ button {
   gap: 0.8rem;
   font-size: 1.4rem;
 }
-.settings-item:hover {
-  background-color: var(--color-hover-bg);
-}
 .settings-item:active {
   background-color: var(--color-border);
 }
 .settings-item.active {
   background-color: var(--color-active-bg-light);
   color: var(--color-accent);
-}
-
-.settings-item.active:hover {
-  background-color: var(--color-active-hover-bg);
 }
 
 /* --- Sidebar (Navigation) --- */
@@ -231,10 +214,6 @@ button {
   font-size: 1.5rem;
 }
 
-#sidebar li a:hover,
-#sidebar li button:hover {
-  background-color: var(--color-hover-bg);
-}
 #sidebar li a:active,
 #sidebar li button:active {
   background-color: var(--color-border);
@@ -242,9 +221,6 @@ button {
 #sidebar li a.active {
   background-color: var(--color-active-bg-light);
   color: var(--color-accent);
-}
-#sidebar li a.active:hover {
-  background-color: var(--color-active-hover-bg);
 }
 
 #sidebar li.is-indented > a,
@@ -322,10 +298,6 @@ button {
   align-items: center; 
   justify-content: space-between;
   border: none;
-}
-
-.spoiler-header:hover {
-  background-color: var(--color-active-hover-bg);
 }
 
 .spoiler-toggle {
@@ -437,7 +409,7 @@ table.sortable th {
 .sort-button .arrow {
   font-size: 0.9em;
   opacity: 0.4;
-  transform: scale(1, .6);
+  transform: scale(1, 0.6);
   display: block;
 }
 .sort-button .arrow.active {
@@ -720,5 +692,53 @@ figure.align-right img {
 
   .spoiler-area {
     max-width: 100%;
+  }
+}
+
+@media (hover: hover) {
+  #top-bar a:hover,
+  #top-bar button:hover {
+    color: var(--color-accent);
+    text-shadow: 1px 1px 3px rgba(0,0,0,0.3);
+  }
+  .settings-item:hover {
+    background-color: var(--color-hover-bg);
+  }
+  .settings-item.active:hover {
+    background-color: var(--color-active-hover-bg);
+  }
+  #sidebar li a:hover,
+  #sidebar li button:hover {
+    background-color: var(--color-hover-bg);
+  }
+  #sidebar li a.active:hover {
+    background-color: var(--color-active-hover-bg);
+  }
+  .spoiler-header:hover {
+    background-color: var(--color-active-hover-bg);
+  }
+}
+
+@media (hover: none) {
+  #top-bar a:active,
+  #top-bar button:active {
+    color: var(--color-accent);
+    text-shadow: 1px 1px 3px rgba(0,0,0,0.3);
+  }
+  .settings-item:active {
+    background-color: var(--color-hover-bg);
+  }
+  .settings-item.active:active {
+    background-color: var(--color-active-hover-bg);
+  }
+  #sidebar li a:active,
+  #sidebar li button:active {
+    background-color: var(--color-hover-bg);
+  }
+  #sidebar li a.active:active {
+    background-color: var(--color-active-hover-bg);
+  }
+  .spoiler-header:active {
+    background-color: var(--color-active-hover-bg);
   }
 }
