@@ -1,3 +1,4 @@
 # site
+[GitHub page](https://github.com/eau6401/site)
 
-[test](https://eau6401.github.io/site/chapter2.html)
+[Test page](https://eau6401.github.io/site/chapter2.html)
