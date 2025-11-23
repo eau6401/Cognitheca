@@ -1,4 +1,4 @@
 # Cognitheca
-[GitHub page](https://github.com/eau6401/site)
+[GitHub page](https://github.com/eau6401/Cognitheca)
 
-[Test page](https://eau6401.github.io/site/chapter2.html)
+[Test page](https://eau6401.github.io/Cognitheca/chapter2.html)
